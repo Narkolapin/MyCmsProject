@@ -1,0 +1,7 @@
+Construction du noyau de la solution web WowMacros
+
+- Mise en place du noyau de l'application : 
+
+Deploiement d'une class php comme noyau de l'application
+Le systéme doit etre capable d'analyser l'url d'accès et de retourner la page correspondante ou de retourner un méssage d'erreur.
+Le systéme utilise les regex pour analyser l'url
