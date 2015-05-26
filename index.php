@@ -31,7 +31,7 @@
 		</section>
 
 		<footer>
-			<?php var_dump($cms->getUrlParameters($_SERVER['REQUEST_URI'])); ?>
+			<?php var_dump($cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"]); ?>
 		</footer>
 	</body>
 </html>

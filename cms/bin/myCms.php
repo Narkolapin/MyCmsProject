@@ -14,6 +14,8 @@
 		private $SiteSection;
 
 		private $Object;
+		
+		private $SectionMatch = false;
 
 
 		/******
@@ -36,8 +38,12 @@
 			// Aucuns parametres détectés, url de l'index
 			if(empty($parameters)){
 				$Object = new IndexController();
+				if(!empty($Object))
+					$this->SectionMatch = true;
+				$this->StatuCode($this->SectionMatch);
 				return $Object->Index();
 			}
+			
 		}
 
 		/**
@@ -56,6 +62,16 @@
 				}
 			}
 			return $getParameters;
+		}
+		
+		
+		
+		private function StatuCode($pageStatus)
+		{
+			If($pageStatus == true)
+				header($_SERVER["SERVER_PROTOCOL"],200);
+			else
+				header($_SERVER["SERVER_PROTOCOL"],404);
 		}
 
 	}
