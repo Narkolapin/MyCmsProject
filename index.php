@@ -5,11 +5,12 @@
 <html>
 	<head>
 		<title>Noyau CMS</title>
+		<meta charset="UTF-8">
 	</head>
 
 	<body>
 		<header>
-			<h1><a href="/">Test du noyeau</a></h1>
+			<h1><a href="/">Test du noyau</a></h1>
 			<ul>
 				<li><a href="/section01">Section01</a></li>
 				<ul>
