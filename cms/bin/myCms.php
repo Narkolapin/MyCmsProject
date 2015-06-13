@@ -1,11 +1,4 @@
 <?php 
-	
-	// Ajoute une réference à tout les controller du CMS
-	// TODO : A modifier
-	foreach (glob("cms/controller/*Controller.php", GLOB_ERR) as $pathFile) {
-		require_once("".$pathFile."");
-	}
-	require_once("error.php");
 	require_once("init.php");
 
 	class Cms 
@@ -26,7 +19,8 @@
 		*/
 		public function Cms(){
 			$this->Url = $_SERVER['REQUEST_URI'];
-			$this->SiteSection = array('admin', 'section01', 'section02', 'section03');
+			$this->SiteSection = array('admin', 'sectionA', 'sectionB', 'sectionC');
+			$this->PatternsActions =  array('add', 'update', 'delete');
 			$this->ControllerMatch = false;
 			$this->Content = "";
 			$this->ErrorClass = null;
@@ -42,24 +36,68 @@
 			$parameters = $this->getUrlParameters($this->Url);
 			$parametersCount = count($parameters);
 			$serverError = false;
-			
+			$Object = null;
+
 			// Controller
-			if($parametersCount >=0 && $parametersCount < 2){
+			if($parametersCount >= 1 || $parametersCount <= 2){
 				foreach ($this->SiteSection as $key => $value) {
-					// TODO déclaration du controller
-				}	
+					if(preg_match("/".$value."/",$parameters[0]) && is_file("cms/controller/".$parameters[0]."Controller.php")) {
+						$objName = ucfirst($parameters[0]);
+						$Object = new $objName();
+						// Si on a qu'un seul paramétre dans l'url
+						if($parametersCount == 1) {
+							$this->ControllerMatch = true;
+							$this->Content = $Object->Home();
+						}
+						break;
+					}
+				}
 			}
 
 			// Action ou affichage d'un POST
 			if($parametersCount == 2){
-				echo "Detecter si on a une action associé ou l'affichage d'un patterne";
+				
+				// Pattern by name
+				if(!is_null($Object) && isset($parameters[1]) && preg_match("/^[a-zA-Z0-9-]*$/", $parameters[1]) == 1){
+					$this->Content = $Object->GetElementByName($parameters[1]);
+					if($this->Content != "")
+						$this->ControllerMatch = true;
+				}
+
+				// Pattern by Id
+				elseif(!is_null($Object) &&  isset($parameters[1]) && preg_match("/^[0-9]*$/", $parameters[1])){
+					$this->Content = $Object->GetElementById($parameters[1]);
+					if($this->Content != "")
+						$this->ControllerMatch = true;
+				}
+
+				// Pas d'objet
+				else
+					$this->ControllerMatch = false;
+
+
+
+				//foreach ($this->PatternsActions as $key => $value) {
+				//	if(preg_match("//", $value)){
+				//		// Pattern by name
+				//		$this->ControllerMatch = true;
+				//		break;
+				//	}
+				//	elseif(preg_match("//", $value)){
+				//
+				//	}
+				//		// Pattern by Id
+				//		break;
+				//	else
+				//		void;
+				//}
 			}
 
 			// Aucuns parametres détectés, url de l'index
 			if($parametersCount == 0) {
 				$Object = new IndexController();
 				$this->ControllerMatch = true;			
-				$this->Content = $Object->Index();
+				$this->Content = $Object->Home();
 			}
 
 			// On récupére les erreures et on envois un message
@@ -68,10 +106,7 @@
 				$this->ErrorClass = new CmsError($this->ErrorCatch);
 			
 			// Status Code
-			$this->StatuCode($this->ControllerMatch);	
-			
-			// Affichage de la donnée
-			return $this->Content;
+			$this->StatuCode($this->ControllerMatch);
 		}
 
 		/**
@@ -97,20 +132,22 @@
 		*	@param $pageStatus : status retourné par le controlleur de la page
 		*	@return void
 		*/
-		private function StatuCode($pageStatus)
-		{
-			If($pageStatus == true)
-				header($_SERVER["SERVER_PROTOCOL"],200);
-			else
-				header($_SERVER["SERVER_PROTOCOL"],404);
-			if($pageStatus == true){
-				header($_SERVER["SERVER_PROTOCOL"]." Ok",200);
-				
-			}
-			else{
+		private function StatuCode($pageStatus) {
+			if($pageStatus == true)
+				header($_SERVER["SERVER_PROTOCOL"]." 200 OK", 200);
+
+			else {
 				header($_SERVER["SERVER_PROTOCOL"]." 404 Not Found",404);
 				$this->Content = file_get_contents("cms/view/404.php");
 			}
+		}
+
+		/**
+		* GETTER de Content
+		*	@return la valeure de la propriété $Content de la class CMS
+		*/
+		public function GetContent() {
+			return $this->Content;
 		}
 	}
 

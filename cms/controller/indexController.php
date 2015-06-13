@@ -1,6 +1,6 @@
 <?php
 	
-	class IndexController
+	class IndexController implements IController
 	{
 
 		private $ViewPath = "cms/view/accueil.php" ;
@@ -12,10 +12,18 @@
 		}
 
 
-		public function Index()
+		public function Home()
 		{
 			return $this->View;
 		}
 
+		public function GetElementByName($pattern){
+			return null;
+
+		}
+
+		public function GetElementById($id){
+			return null;
+		}
 	}
 ?>
