@@ -20,7 +20,6 @@
 		public function Cms(){
 			$this->Url = $_SERVER['REQUEST_URI'];
 			$this->SiteSection = array('admin', 'sectionA', 'sectionB', 'sectionC');
-			$this->PatternsActions =  array('add', 'update', 'delete');
 			$this->ControllerMatch = false;
 			$this->Content = "";
 			$this->ErrorClass = null;
@@ -39,7 +38,7 @@
 			$Object = null;
 
 			// Controller
-			if($parametersCount >= 1 || $parametersCount <= 2){
+			if($parametersCount >= 1 && $parametersCount <= 2){
 				foreach ($this->SiteSection as $key => $value) {
 					if(preg_match("/".$value."/",$parameters[0]) && is_file("cms/controller/".$parameters[0]."Controller.php")) {
 						$objName = ucfirst($parameters[0]);
@@ -56,9 +55,16 @@
 
 			// Action ou affichage d'un POST
 			if($parametersCount == 2){
+
+				// Admin
+				if(!is_null($Object) && $parameters[0] == "admin" && isset($parameters[1])){
+					$this->Content = $Object->CallAction($parameters, $this->SiteSection);
+					if($this->Content != "")
+						$this->ControllerMatch = true;
+				}				
 				
 				// Pattern by name
-				if(!is_null($Object) && isset($parameters[1]) && preg_match("/^[a-zA-Z0-9-]*$/", $parameters[1]) == 1){
+				elseif(!is_null($Object) && isset($parameters[1]) && preg_match("/^[a-zA-Z0-9-]*$/", $parameters[1]) == 1){
 					$this->Content = $Object->GetElementByName($parameters[1]);
 					if($this->Content != "")
 						$this->ControllerMatch = true;
@@ -74,23 +80,6 @@
 				// Pas d'objet
 				else
 					$this->ControllerMatch = false;
-
-
-
-				//foreach ($this->PatternsActions as $key => $value) {
-				//	if(preg_match("//", $value)){
-				//		// Pattern by name
-				//		$this->ControllerMatch = true;
-				//		break;
-				//	}
-				//	elseif(preg_match("//", $value)){
-				//
-				//	}
-				//		// Pattern by Id
-				//		break;
-				//	else
-				//		void;
-				//}
 			}
 
 			// Aucuns parametres détectés, url de l'index

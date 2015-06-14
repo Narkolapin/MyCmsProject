@@ -25,6 +25,12 @@
 				<li><a href="/sectionB">SectionB</a></li>
 				<li><a href="/sectionC">SectionC</a></li>
 				<li><a href="/admin">Admin</a></li>
+				<ul>
+					<li><a href="/Admin/action?section=sectionA">Admin Index</a></li>
+					<li><a href="/Admin?section=sectionA&action=add">Admin Add</a></li>
+					<li><a href="/Admin?section=sectionA&action=edit&id=1">Admin Edit</a></li>
+					<li><a href="/Admin?section=sectionA&action=delete&id=1">Admin Delete</a></li>
+				</ul>
 			</ul>	
 		</header>
 
@@ -33,7 +39,7 @@
 		</section>
 
 		<footer>
-			<?php var_dump($cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"]); ?>
+			<?php var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"], is_file("cms/controller/".$t[0]."Controller.php")); ?>
 		</footer>
 	</body>
 </html>

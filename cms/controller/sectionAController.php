@@ -3,7 +3,7 @@
 
 class SectionA {
 
-	private $ViewPath = "cms/view/sectionA/home.php" ;
+	private $ViewPath = "cms/view/sectionA/index.php" ;
 	private $View;
 
 	public function SectionA()
