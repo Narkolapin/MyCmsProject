@@ -21,32 +21,45 @@
 			$this->Url = $_SERVER['REQUEST_URI'];
 			$this->SiteSection = array('admin', 'sectionA', 'sectionB', 'sectionC');
 			$this->ControllerMatch = false;
-			$this->Content = "";
+			$this->Content = null;
 			$this->ErrorClass = null;
 			$this->ErrorCatch = null;
+			
+			// Appels des fonctions
+			$this->Main();
 		}
 
 		/******
 		*	Fonction Main : affiche le contenu de la page 
-		*		Initialise une nouvelle instance de CMS
+		*	Initialise une nouvelle instance de CMS
 		*/
-		public function Main(){
+		private function Main(){
 
-			$parameters = $this->getUrlParameters($this->Url);
-			$parametersCount = count($parameters);
+			if (isset($_GET['controller']) && $_GET['controller'] != "")
+				$controller = $_GET['controller'];
+			if (isset($_GET['patterne']) && $_GET['patterne'] != "")
+				$patterne = $_GET['patterne'];
+
+			
+			//$parameters = $this->getUrlParameters($this->Url);
+			//$parametersCount = count($parameters);
 			$serverError = false;
 			$Object = null;
 
+
+
 			// Controller
-			if($parametersCount >= 1 && $parametersCount <= 2){
+			if(isset($controller))
+			{
 				foreach ($this->SiteSection as $key => $value) {
-					if(preg_match("/".$value."/",$parameters[0]) && is_file("cms/controller/".$parameters[0]."Controller.php")) {
-						$objName = ucfirst($parameters[0]);
+					if(preg_match("/".$value."/",$controller) && is_file("cms/controller/".$controller."Controller.php")) {
+						$objName = ucfirst($controller);
 						$Object = new $objName();
 						// Si on a qu'un seul paramétre dans l'url
-						if($parametersCount == 1) {
-							$this->ControllerMatch = true;
+						if(!isset($patterne)) {
 							$this->Content = $Object->Home();
+							if($this->Content != null)
+								$this->ControllerMatch = true;
 						}
 						break;
 					}
@@ -54,26 +67,26 @@
 			}
 
 			// Action ou affichage d'un POST
-			if($parametersCount == 2){
+			if(isset($controller) && isset($patterne)){
 
 				// Admin
-				if(!is_null($Object) && $parameters[0] == "admin" && isset($parameters[1])){
+				if(!is_null($Object) && $controller == "admin" && isset($patterne)){
 					$this->Content = $Object->CallAction($parameters, $this->SiteSection);
-					if($this->Content != "")
+					if($this->Content != null)
 						$this->ControllerMatch = true;
 				}				
 				
 				// Pattern by name
-				elseif(!is_null($Object) && isset($parameters[1]) && preg_match("/^[a-zA-Z0-9-]*$/", $parameters[1]) == 1){
-					$this->Content = $Object->GetElementByName($parameters[1]);
-					if($this->Content != "")
+				elseif(!is_null($Object) && isset($controller) && preg_match("/^[a-zA-Z0-9-]*$/", $patterne) == 1){
+					$this->Content = $Object->GetElementByName($patterne);
+					if($this->Content != null)
 						$this->ControllerMatch = true;
 				}
 
 				// Pattern by Id
-				elseif(!is_null($Object) &&  isset($parameters[1]) && preg_match("/^[0-9]*$/", $parameters[1])){
-					$this->Content = $Object->GetElementById($parameters[1]);
-					if($this->Content != "")
+				elseif(!is_null($Object) &&  isset($controller) && preg_match("/^[0-9]*$/", $patterne)){
+					$this->Content = $Object->GetElementById($patterne);
+					if($this->Content != null)
 						$this->ControllerMatch = true;
 				}
 
@@ -83,7 +96,7 @@
 			}
 
 			// Aucuns parametres détectés, url de l'index
-			if($parametersCount == 0) {
+			if(!isset($controller) && !isset($patterne)) {
 				$Object = new IndexController();
 				$this->ControllerMatch = true;			
 				$this->Content = $Object->Home();

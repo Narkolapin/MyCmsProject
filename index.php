@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 
 <?php 
-	require_once("/cms/bin/myCms.php"); 
+	require_once("cms/bin/myCms.php"); 
 	$cms = new Cms(); 
-	$cms->Main();
 ?>
 
 <html>
@@ -26,10 +25,10 @@
 				<li><a href="/sectionC">SectionC</a></li>
 				<li><a href="/admin">Admin</a></li>
 				<ul>
-					<li><a href="/Admin/action?section=sectionA">Admin Index</a></li>
-					<li><a href="/Admin?section=sectionA&action=add">Admin Add</a></li>
-					<li><a href="/Admin?section=sectionA&action=edit&id=1">Admin Edit</a></li>
-					<li><a href="/Admin?section=sectionA&action=delete&id=1">Admin Delete</a></li>
+					<li><a href="/admin/action?ctrl=sectionA">Admin Index</a></li>
+					<li><a href="/admin/action?ctrl=sectionA&act=add">Admin Add</a></li>
+					<li><a href="/admin/action?ctrl=sectionA&act=edit&id=1">Admin Edit</a></li>
+					<li><a href="/admin/action?ctrl=sectionA&act=delete&id=1">Admin Delete</a></li>
 				</ul>
 			</ul>	
 		</header>
@@ -39,7 +38,7 @@
 		</section>
 
 		<footer>
-			<?php var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"], is_file("cms/controller/".$t[0]."Controller.php")); ?>
+			<?php var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"]); ?>
 		</footer>
 	</body>
 </html>
