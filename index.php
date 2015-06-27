@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 
 <?php 
-	require_once("cms/bin/myCms.php"); 
+	require_once("cms/bin/myCms.php");
+	$debeug = false;
 	$cms = new Cms();
 ?>
 
@@ -25,10 +26,10 @@
 				<li><a href="/sectionC">SectionC</a></li>
 				<li><a href="/admin/">Admin</a></li>
 				<ul>
-					<li><a href="/admin/">Admin Index</a></li>
-					<li><a href="/admin/sectionA/add">Admin Add</a></li>
-					<li><a href="/admin/action?ctrl=sectionA&act=edit&id=1">Admin Edit</a></li>
-					<li><a href="/admin/action?ctrl=sectionA&act=delete&id=1">Admin Delete</a></li>
+					<li><a href="/admin/sectionA">Admin SectionA</a></li>
+					<li><a href="/admin/sectionA/add">Admin SectionA Add</a></li>
+					<li><a href="/admin/sectionA/edit/1">Admin SectionA Edit</a></li>
+					<li><a href="/admin/sectionA/delete/1">Admin SectionA Delete</a></li>
 				</ul>
 			</ul>	
 		</header>
@@ -38,7 +39,10 @@
 		</section>
 
 		<footer>
-			<?php //var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"], $_SERVER['REQUEST_URI']); ?>
+		<?php 
+			if($debeug)
+				var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"]); 
+		?>
 		</footer>
 	</body>
 </html>

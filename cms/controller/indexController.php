@@ -1,6 +1,6 @@
 <?php
 	
-	class IndexController implements IController
+	class IndexController
 	{
 
 		private $ViewPath = "cms/view/accueil.php" ;

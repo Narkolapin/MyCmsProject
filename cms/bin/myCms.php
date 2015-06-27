@@ -37,51 +37,49 @@
 			if (isset($_GET['pattern']) && $_GET['pattern'] != "")
 				$pattern = $_GET['pattern'];
 			if (isset($_GET['on']) && $_GET['on'] != "")
-				$pattern = $_GET['on'];
+				$on = $_GET['on'];
 
 			$Object = null;
-			$debeug = false;
-
+			global $debeug;
 
 			// Controller
 			if(isset($controller))
 			{
-				foreach ($this->SiteSection as $key => $value) {
-					if(preg_match("/".$value."/",$controller) && is_file("cms/controller/".$controller."Controller.php")) {
-						$objName = ucfirst($controller);
-						$Object = new $objName();
-						// Si on a qu'un seul paramétre dans l'url
-						if(!isset($pattern) || !isset($on)) {
-							$launch = true;
-							// Vérification des droits pour la partie admin
-							if($controller == "admin" && !$this->IsAdmin("admin", "active")){
-								$launch = false;
-								$this->BadRequest = true;
-							}
-							// Création de l'Objet
-							if($launch) {
-								$this->Content = $Object->Home();
-								if($this->Content != null)
-									$this->ControllerMatch = true;
-							}
-						}
-						break;
+				$Object = $this->IsController($controller);
+
+				if(!isset($pattern) && !isset($on) && isset($Object)) {
+					$launch = true;
+					// Vérification des droits pour la partie admin
+					if($controller == "admin" && !$this->IsAdmin("admin", "active")){
+						$launch = false;
+						$this->BadRequest = true;
+					}
+					// Création de l'Objet
+					if($launch) {
+						$this->Content = $Object->Home();
+						if($this->Content != null)
+							$this->ControllerMatch = true;
 					}
 				}
 			}
 
-			// Action ou affichage d'un POST
-			if(isset($controller) && (isset($pattern) || isset($on))){
-
-				// Admin
-				if(!is_null($Object) && $controller == "admin" && isset($pattern)){
-						$this->Content = $Object->CallAction();
+			// Admin
+			if(isset($controller) && isset($on)){
+				if(!is_null($Object) && $controller == "admin"){
+					$onController = $this->IsController($on);
+					if(isset($onController)){
+						$this->Content = $Object->CallAction($onController);
 						if($this->Content != null)
 							$this->ControllerMatch = true;
-				}				
-				
+					}
+				}			
+			}
+
+			// Action ou affichage d'un POST
+			if(isset($controller) && isset($pattern)){
+
 				// Pattern by name
-				elseif(!is_null($Object) && isset($controller) && preg_match("/^[a-zA-Z0-9-]*$/", $pattern) == 1){
+				if(!is_null($Object) && isset($controller) && preg_match("/^[a-zA-Z0-9-]*$/", $pattern) == 1){
 					$this->Content = $Object->GetElementByName($pattern);
 					if($this->Content != null)
 						$this->ControllerMatch = true;
@@ -116,12 +114,14 @@
 
 			if($debeug){
 				var_dump(
-					isset($controller), 
-					isset($pattern), 
-					$Object, 
+					//isset($controller), 
+					//isset($pattern),
+					//isset($on),
+					//$Object, 
 					$_GET, 
-					count($_GET), 
-					$this->ControllerMatch,
+					//count($_GET), 
+					//$this->ControllerMatch,
+					//$on,
 					$this->BadRequest
 					);
 			}
@@ -193,6 +193,24 @@
 				return false;
 		}
 
+		/**
+		* Determine si le parametre $_GET['controller'] existe
+		*
+		* @param string $varCtrlName : nom du controller a tester
+		* @return object $Object : objet du controller
+		*
+		****************/
+		private function IsController($varCtrlName){
+			global $debeug;
+			foreach ($this->SiteSection as $key => $value) {
+				if($debeug)
+					echo "Check : ".$value." avec ". $varCtrlName ." is match => ".preg_match("/".$value."/",$varCtrlName)." is file : ".is_file("cms/controller/".$varCtrlName."Controller.php")."<br/>";
+				if(preg_match("/".$value."/",$varCtrlName) && is_file("cms/controller/".$varCtrlName."Controller.php")) {
+					$objName = ucfirst($varCtrlName);
+					return $Object = new $objName();
+				}
+			}
+			return null;
+		}
 	}
-
 ?>

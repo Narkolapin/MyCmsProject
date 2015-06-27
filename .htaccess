@@ -8,6 +8,6 @@ RewriteCond  %{REQUEST_URI}  ^/admin[/]{0,1}(.+)$
 RewriteRule  ^([a-zA-Z0-9-]*)[/]{0,1}([a-zA-Z0-9-]*)[/]{0,1}([a-zA-Z0-9-]*)[/]{0,1}([a-zA-Z0-9-]*)$ index.php?controller=$1&on=$2&doaction=$3&to=$4 [L]
 
 #Default
-RewriteRule ^([a-zA-Z0-9-]*)[/]{0,1}([a-zA-Z0-9-]*)$ index.php?controller=$1&pattern=$2 [L]
+RewriteRule ^([a-zA-Z0-9-]*)[/]{0,1}([a-zA-Z0-9-]*)$ index.php?controller=$1&pattern=$2 [QSA,L]
 
 
