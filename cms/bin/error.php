@@ -11,7 +11,7 @@ class CmsError
 	{
 		$this->Error = $catchedError;
 		register_shutdown_function(array($this, 'CatchFatalError'), $this->Error);
-		var_dump($this->Error);
+		//var_dump($this->Error);
 	}
 
 

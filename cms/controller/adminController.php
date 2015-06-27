@@ -2,43 +2,40 @@
 
 	class Admin
 	{
-
+//index.php?controller=$1&on=$2&doaction=$3&to=$4
 		private $AdminActions;
+		private $On;
+		private $DoAction;
+		private $To;
 
 
 		public function Admin()
 		{
 			$this->AdminActions =  array('add', 'update', 'delete');
+			
+			if (isset($_GET['on']) && $_GET['on'] != "")
+				$this->On = $_GET['on'];
+			if (isset($_GET['doaction']) && $_GET['doaction'] != "")
+				$this->DoAction = $_GET['doaction'];
+			if (isset($_GET['to']) && $_GET['to'] != "")
+				$this->To = $_GET['to'];
 		}
 
 		
 		public function Home(){
-			
-			if($this->IsAdmin("admin", "active"))
 				return "Coucou Admin";
-
 		}
 
 
 		/**
-		* Appel les action dans les controller
+		* Appel des action dans les controller
 		*
 		* @param parameters : parametres de l'url
 		* @return la vue de l'action
 		*
 		*****/
-		public function CallAction($parameters, $sectionSite){
+		public function CallAction(){
 
-			if(!$this->IsAdmin("admin", "active"))									// IsAdmin
-				return;
-			if(count($parameters < 2))												// Deux param a analyser
-				return;
-			if(empty($_GET['ctrl']) || empty($_GET['act']))							// Parametres GET obligatoirs
-				return;
-			if(!in_array($_GET['ctrl'], $sectionSite))								// aucun controller connus
-				return;
-			if(!in_array($_GET['act'], $this->AdminActions))						// aucunes actions connus
-				return;
 		}
 
 		private function getParameters(){

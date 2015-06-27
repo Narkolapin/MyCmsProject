@@ -2,7 +2,7 @@
 
 <?php 
 	require_once("cms/bin/myCms.php"); 
-	$cms = new Cms(); 
+	$cms = new Cms();
 ?>
 
 <html>
@@ -23,10 +23,10 @@
 				</ul>
 				<li><a href="/sectionB">SectionB</a></li>
 				<li><a href="/sectionC">SectionC</a></li>
-				<li><a href="/admin">Admin</a></li>
+				<li><a href="/admin/">Admin</a></li>
 				<ul>
-					<li><a href="/admin/action?ctrl=sectionA">Admin Index</a></li>
-					<li><a href="/admin/action?ctrl=sectionA&act=add">Admin Add</a></li>
+					<li><a href="/admin/">Admin Index</a></li>
+					<li><a href="/admin/sectionA/add">Admin Add</a></li>
 					<li><a href="/admin/action?ctrl=sectionA&act=edit&id=1">Admin Edit</a></li>
 					<li><a href="/admin/action?ctrl=sectionA&act=delete&id=1">Admin Delete</a></li>
 				</ul>
@@ -38,7 +38,7 @@
 		</section>
 
 		<footer>
-			<?php var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"]); ?>
+			<?php //var_dump($t = $cms->getUrlParameters($_SERVER['REQUEST_URI']), $_SERVER["SERVER_PROTOCOL"], $_SERVER['REQUEST_URI']); ?>
 		</footer>
 	</body>
 </html>
