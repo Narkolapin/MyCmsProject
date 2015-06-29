@@ -3,12 +3,14 @@
 
 class SectionA {
 
+	private $viewFolder;
 	private $ViewPath = "cms/view/sectionA/index.php" ;
 	private $View;
 
 	public function SectionA()
 	{
 		$this->View = file_get_contents($this->ViewPath);
+		$this->viewFolder = "cms/view/". strtolower(get_class($this)) ."/";
 	}
 
 
@@ -31,10 +33,16 @@ class SectionA {
 	}
 
 	public function Add($method){
-		if($method == "POST")
+		
+		if($method == "POST"){
+			var_dump($_POST);
 			return 'Page ajouter';
-		if($method == "GET")
-			return 'Page pour ajouter';
+		}
+		
+		if($method == "GET"){
+			$this->viewFolder = $this->viewFolder."add.php";
+			return file_get_contents($this->viewFolder);
+		}
 		return null;
 	}
 
