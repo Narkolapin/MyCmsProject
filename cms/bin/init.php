@@ -7,6 +7,12 @@
 		require_once("".$pathFile."");
 	}
 
+
+	// MySql
+	$host = "127.0.0.1";
+	$userBdd = "root";
+	$pwdBdd = "";
+
 	
 	//ini_set("error_reporting", 0);	//Récupére toutes les erreures
 	//ini_set("display_errors", 1);	// Affiche (ou non) toutes les erreures à l'ecran
