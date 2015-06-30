@@ -1,5 +1,5 @@
 <?php
-
+require_once("/cms/model/IModel.php");
 /**
 * 
 */
@@ -16,9 +16,8 @@ class MySQLTools
 		$this->_user = $user;
 		$this->_pwd = $pwd;
 		$this->_dbName = $dbName;
-		$this->$_mysqlObject = $this->MySqlConnect();
+		$this->_mysqlObject = $this->MySqlConnect();
 	}
-
 
 	/**
 	* Connexion à la base de données
@@ -30,6 +29,7 @@ class MySQLTools
 		{
 			$connectString = 'mysql:host='.$this->_host.';dbname='.$this->_dbName.'';
 			$dbc = new PDO($connectString, $this->_user, $this->_pwd);
+			var_dump($dbc);
 			return $dbc;
 		} 
 		catch (Exception $e) {
@@ -37,20 +37,19 @@ class MySQLTools
 		}
 	}
 
-	Private static function Insert(Object $entity)
-	{
+	public function Insert(Imodel $entity){
+		
 		$tabName = strtolower(get_class($entity));
 		try 
 		{
-			if(!$this->DataBaseExist($tabName))
+			if(!$this->TableExist($tabName))
 				throw new Exception("Aucune entité ne posséde le nom : ". $tabName ."", 1);
-				
+			echo "Je suis passé";	
 			// Logique d'insertion de l'objet $entity dans la base
 		} 
 		catch (Exception $e) {
 			die($e->getMessage); //TODO logger les erreurs
 		}
-
 	}
 
 	/**
@@ -67,12 +66,12 @@ class MySQLTools
 	* @param string nom de table à tester
 	* @return bool resprésentant l'existance de la table
 	*/
-	private function DataBaseExist(string $tabName)
+	public function TableExist($tabName)
 	{
 		$exist = false;
 		try 
 		{
-			$this->$_mysqlObject->exec("SELECT * FROM ". $tabName ." WHERE 1");
+			$this->_mysqlObject->exec("SELECT * FROM ". $tabName ." WHERE 1");
 			$exist = true;
 		} 
 		catch (Exception $e) 

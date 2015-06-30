@@ -1,5 +1,7 @@
 <?php
-
+include("/cms/model/sectionAModel.php");
+include("/cms/bin/MySQLTools.php");
+include("/cms/bin/init.php");
 
 class SectionA {
 
@@ -35,7 +37,11 @@ class SectionA {
 	public function Add($method){
 		
 		if($method == "POST"){
-			var_dump($_POST);
+				$host = "127.0.0.1";			// TODO :  a déplacer
+				$userBdd = "root";				// TODO :  a déplacer	
+				$pwdBdd = "";					// TODO :  a déplacer
+			$mysql = new MySQLTools($host,$userBdd,$pwdBdd, "cms");
+			$mysql->Insert(new sectionAModel($_POST));
 			return 'Page ajouter';
 		}
 		
