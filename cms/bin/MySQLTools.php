@@ -27,9 +27,9 @@ class MySQLTools
 	private function MySqlConnect(){
 		try 
 		{
-			$connectString = 'mysql:host='.$this->_host.';dbname='.$this->_dbName.'';
+			$connectString = 'mysql:host='.$this->_host.';dbname='.$this->_dbName.';charset=utf8';
 			$dbc = new PDO($connectString, $this->_user, $this->_pwd);
-			var_dump($dbc);
+			$dbc->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 			return $dbc;
 		} 
 		catch (Exception $e) {
@@ -37,19 +37,39 @@ class MySQLTools
 		}
 	}
 
-	public function Insert(Imodel $entity){
+	/**
+	* Envois d'une requete INSERT a la base de donnée MySQL
+	* @param IModel $entity 
+	* @return bool $success
+	*/
+	public function Insert(IModel $entity){
 		
-		$tabName = strtolower(get_class($entity));
-		try 
-		{
-			if(!$this->TableExist($tabName))
+		$success = false;
+		$tabName = str_replace("model", "", strtolower(get_class($entity)));		
+		$stringParam = "(";															
+		$stringValue = "(";															
+		
+		try {
+			if(!$this->TableExist($this->_dbName, $tabName))
 				throw new Exception("Aucune entité ne posséde le nom : ". $tabName ."", 1);
-			echo "Je suis passé";	
-			// Logique d'insertion de l'objet $entity dans la base
+			// Création e la requete
+			foreach ($entity->GetObjectProperty() as $key => $value) {
+				$stringParam = $stringParam . "" . strtolower($key) .",";
+				$stringValue = $stringValue . "\"" . $value . "\",";
+			}
+			$stringParam = substr($stringParam, 0, -1).")";
+			$stringValue = substr($stringValue, 0, -1).")";
+			$stringRequest = "INSERT INTO ".$tabName." ".$stringParam." VALUES ".$stringValue."";
+
+			// Envois de la requete
+			$launch = $this->_mysqlObject->query($stringRequest);
+			$success = true;
 		} 
-		catch (Exception $e) {
-			die($e->getMessage); //TODO logger les erreurs
+		catch (Exception $e){
+			echo 'Erreur MySQL : ';
+			echo ''.$e->getMessage().' '.$e->getCode().''; //TODO logger les erreurs
 		}
+		return $success;
 	}
 
 	/**
@@ -66,16 +86,20 @@ class MySQLTools
 	* @param string nom de table à tester
 	* @return bool resprésentant l'existance de la table
 	*/
-	public function TableExist($tabName)
-	{
+	public function TableExist($dbName, $tabName){
 		$exist = false;
 		try 
 		{
-			$this->_mysqlObject->exec("SELECT * FROM ". $tabName ." WHERE 1");
-			$exist = true;
+			$stringRequest = "SELECT * FROM information_schema.tables WHERE table_schema = '".$dbName."' AND table_name = '". $tabName ."' LIMIT 1";
+			$launch = $this->_mysqlObject->query($stringRequest);
+			$responce = $launch->fetch(PDO::FETCH_ASSOC);
+			if($responce != false)
+				$exist = true;
+			$launch->closeCursor();
 		} 
 		catch (Exception $e) 
 		{
+			echo $e->getMessage();
 			return $exist;
 		}
 		return $exist;
