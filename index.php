@@ -14,7 +14,7 @@
 
 	<body>
 		<header>
-			<h1><a href="/">Test du noyau</a></h1>
+			<h1 ><a href="/" style="color:red;">Test du noyau</a></h1>
 			<ul>
 				<li><a href="/sectionA">SectionA</a></li>
 				<ul>

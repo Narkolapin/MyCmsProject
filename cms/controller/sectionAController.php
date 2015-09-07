@@ -8,20 +8,43 @@ class SectionA {
 	private $viewFolder;
 	private $ViewPath = "cms/view/sectionA/index.php" ;
 	private $View;
+	private $mysql = null;
+	private $Entity = null;
 
-	public function SectionA()
-	{
+	public function SectionA() {
 		$this->View = file_get_contents($this->ViewPath);
 		$this->viewFolder = "cms/view/". strtolower(get_class($this)) ."/";
+		
+		$host = "127.0.0.1";			// TODO :  a déplacer
+		$userBdd = "root";				// TODO :  a déplacer	
+		$pwdBdd = "";					// TODO :  a déplacer
+		
+		$this->mysql = new MySQLTools(
+			$host,
+			$userBdd,
+			$pwdBdd,
+			"cms"
+		);
 	}
 
 
 	public function Home()
 	{
-		return $this->View;
+		$view = $this->View;
+		
+		// Traitement du rendu
+		$content = "<ul>";
+		foreach ($this->mysql->Select(new sectionAModel()) as $key => $value) {
+			$content = $content."<li>Le ".$value->Get_Date()." : ".$value->Get_Text()."</i>";
+		}
+		$content = $content. "</ul>";
+		
+		return preg_replace('/@{content}/i',$content, $view);
 	}
 
-
+	/*
+	* A fusionner 
+	*/
 	public function GetElementByName($pattern){
 		return "Retour de la SectionA avec un pattern : ". $pattern;
 	}
@@ -29,26 +52,26 @@ class SectionA {
 	public function GetElementById($id){
 		return "Retour de la fonction avec un id : ". $id;
 	}
+	/*
+	* ------------------------------
+	*/
 
 	public function Admin(){
 		return 'Page d\'administration de la sectionA';
 	}
 
-	public function Add($method){
+	public function Add($method) {
 		
-		if($method == "POST"){
-				$host = "127.0.0.1";			// TODO :  a déplacer
-				$userBdd = "root";				// TODO :  a déplacer	
-				$pwdBdd = "";					// TODO :  a déplacer
-			$mysql = new MySQLTools($host,$userBdd,$pwdBdd, "cms");
-			$mysql->Insert(new sectionAModel($_POST));
-			return 'Page ajouter';
-		}
+		// Enregistrement en base
+		if($method == "POST")
+			$this->mysql->Insert(new sectionAModel($_POST));
 		
-		if($method == "GET"){
+		// Affichage de la vue
+		if($method == "GET") {
 			$this->viewFolder = $this->viewFolder."add.php";
 			return file_get_contents($this->viewFolder);
 		}
+
 		return null;
 	}
 

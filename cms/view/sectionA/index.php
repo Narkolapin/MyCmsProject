@@ -6,5 +6,7 @@
 </article>
 
 <article>
-	<p>Des trucs à afficher </p>
+	<h2>Liste de la section A :</h2>
+
+	@{content}
 </article>

@@ -8,8 +8,12 @@ class sectionAModel extends IModel
 	private $Text;
 	private $Date;
 
-	public function sectionAModel(array $post){
-		$this->ModelReflexion($post);
+	public function __construct() {
+	}
+
+	public function sectionAModel(array $post = null){
+		if(isset($post))
+			$this->ModelReflexion($post);
 		$this->Id = null;
 		$this->Date = date("Y-m-d H:i:s");
 	}

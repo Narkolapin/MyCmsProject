@@ -45,13 +45,13 @@ class MySQLTools
 	public function Insert(IModel $entity){
 		
 		$success = false;
-		$tabName = str_replace("model", "", strtolower(get_class($entity)));		
+		$_tabName = str_replace("model", "", strtolower(get_class($entity)));		
 		$stringParam = "(";															
 		$stringValue = "(";															
 		
 		try {
-			if(!$this->TableExist($this->_dbName, $tabName))
-				throw new Exception("Aucune entité ne posséde le nom : ". $tabName ."", 1);
+			if(!$this->TableExist($this->_dbName, $_tabName))
+				throw new Exception("Aucune entité ne posséde le nom : ". $_tabName ."", 1);
 			// Création e la requete
 			foreach ($entity->GetObjectProperty() as $key => $value) {
 				$stringParam = $stringParam . "" . strtolower($key) .",";
@@ -59,7 +59,7 @@ class MySQLTools
 			}
 			$stringParam = substr($stringParam, 0, -1).")";
 			$stringValue = substr($stringValue, 0, -1).")";
-			$stringRequest = "INSERT INTO ".$tabName." ".$stringParam." VALUES ".$stringValue."";
+			$stringRequest = "INSERT INTO ".$_tabName." ".$stringParam." VALUES ".$stringValue."";
 
 			// Envois de la requete
 			$launch = $this->_mysqlObject->query($stringRequest);
@@ -74,11 +74,60 @@ class MySQLTools
 
 	/**
 	* Génere une requette Select dans une base Mysql
-	* @param null
+	* @param array $fieldSelect : paramétres optionnel pour la recherche d'une ligne
+	* @param array $condition : parametres conditionnels
+	* @param IModel $entity : objet de l'entité qui sera
 	* @return array
 	*/
-	public function Select(){
-		throw new Exception("Methode non implémentée", 1);
+	public function Select(IModel $entity, array $fieldSelect = null, array $condition = null){
+		try 
+		{
+ 			$result = array();
+			$_fieldName = "";
+			$_condition = "";
+			$_tableName = substr(strtolower(get_class($entity)),0, -5);
+			
+			// Test _tableName
+			if(!$this->TableExist($this->_dbName, $_tableName))
+				throw new Exception("Error Processing Request SELECT, invalide _tableName", 1);
+				
+			// Champs à récupérer
+			if(isset($fieldSelect)){
+				foreach ($fieldSelect as $value) {
+					$_fieldName = $_fieldName." ".$value.",";
+				}
+				
+				$_fieldName = substr($_fieldName, 0, -1)." ";
+			}
+			else {
+				$_fieldName = "*";
+			}
+
+			// elements conditionnel
+			if(isset($condition)) {
+				foreach ($condition as $key => $value) {
+					$_condition = $_condition." ".$key."=".$value.",";
+				}
+
+				$_condition = substr($_condition, 0, -1);	
+			}				
+			else {
+				$_condition = "1";
+			}
+
+			// Envoi de la requete
+			$stringRequest = "SELECT ".$_fieldName." FROM ". $_tableName ." WHERE ".$_condition;
+			$launch = $this->_mysqlObject->prepare($stringRequest);
+			$launch->setFetchMode(PDO::FETCH_CLASS, get_class($entity));
+			$launch->execute();
+			$result = $launch->fetchAll();
+			$launch->closeCursor();
+			return $result;
+		} 
+		catch (Exception $e) {
+			var_dump($e);
+		}
+
 	}
 
 	/**
@@ -86,11 +135,11 @@ class MySQLTools
 	* @param string nom de table à tester
 	* @return bool resprésentant l'existance de la table
 	*/
-	public function TableExist($dbName, $tabName){
+	private function TableExist($dbName, $tableName){
 		$exist = false;
 		try 
 		{
-			$stringRequest = "SELECT * FROM information_schema.tables WHERE table_schema = '".$dbName."' AND table_name = '". $tabName ."' LIMIT 1";
+			$stringRequest = "SELECT * FROM information_schema.tables WHERE table_schema = '".$dbName."' AND table_name = '". $tableName ."' LIMIT 1;";
 			$launch = $this->_mysqlObject->query($stringRequest);
 			$responce = $launch->fetch(PDO::FETCH_ASSOC);
 			if($responce != false)
